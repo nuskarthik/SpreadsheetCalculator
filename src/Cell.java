@@ -7,7 +7,7 @@ public class Cell {
 	private int row;
 	private int column;
 	private String expression;
-	private boolean evaluated;
+	public boolean evaluated;
 	private float evaluatedExpression;
 	public HashMap<String, Float> dependent;
 	
@@ -41,6 +41,7 @@ public class Cell {
 	}
 	
 	public void evaluateAgain(){
+		this.evaluated = true;
 		evaluatedExpression = postfix.evaluateTree();
 	}
 	

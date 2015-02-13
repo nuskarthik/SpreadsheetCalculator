@@ -81,6 +81,9 @@ public class SpreadsheetCalculator {
 				if(dependency.size()>0){
 					evalList.add(c);
 				}
+				else{
+					
+				}
 			}
 		}
 	}
@@ -102,9 +105,15 @@ public class SpreadsheetCalculator {
 			}
 			else{
 				if(dependencyMap.get(id)!=null){
-					HashMap currentMapForId = dependencyMap.get(id);
-					currentMapForId.put(currentDependency, true);
-					dependencyMap.put(id, currentMapForId);
+					HashMap<String, Boolean> currentMapForId = dependencyMap.get(id);
+					if(currentMapForId.get(currentDependency)!=null){
+						currentMapForId.put(currentDependency, true);
+						dependencyMap.put(id, currentMapForId);
+					}
+					else{
+						currentMapForId.put(currentDependency, true);
+						dependencyMap.put(id, currentMapForId);
+					}
 				}
 				else{
 					HashMap<String, Boolean> newMapForId = new HashMap<>();
@@ -125,12 +134,42 @@ public class SpreadsheetCalculator {
 	}
 	
 	private static void calculateOutput() {
-		for( int i =0 ;i< evalList.size() ;i++){
-			Cell cur = evalList.get(i);
+		int i=0;
+		
+		while(!evalList.isEmpty()){
+			
+			Cell cur = evalList.get(0);
+			
 			if(errorCells.get(cur.getId())==null){
+			
 				HashMap<String, Float> dep = findDependecies(cur);
 				cur.setDependent(dep);
 				cur.evaluateAgain();
+				evalList.remove(0);
+				
+				//check if dependencies change the answer
+				boolean dependencyFlag = false;
+				if(dep.size()>0){
+					Iterator it = dep.entrySet().iterator();
+					while(it.hasNext()){
+						Map.Entry pairs = (Map.Entry) it.next();
+						String cellId = (String) pairs.getKey();
+						HashMap<String, Boolean> tempMap = dependencyMap.get(cur.getId());
+						if(tempMap.get(cellId) != null){
+							Cell c = getCell(cellId.charAt(0), cellId.charAt(1));
+							//c.evaluateAgain();
+							if(c.evaluated==false){
+								evalList.add(0,c);
+								dependencyFlag = true;
+							}
+						}
+						dependencyMap.put(cur.getId(), tempMap);
+					}
+					if(dependencyFlag){
+						cur.evaluated = false;
+						evalList.add(cur);
+					}
+				}
 			}
 		}
 	}
