@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 
 public class ExpressionTree {
@@ -8,10 +10,14 @@ public class ExpressionTree {
 	 private TreeNode root;
 	 
 	 public ArrayList<String> dependencies;
+	 Operators apply;
+	 public HashMap<String, Float> dependent;
 	 
 	 public ExpressionTree(String exp){
 		 this.postfix = exp.trim().split("\\s+");
 		 createExpressionTree();
+		 apply = new Operators();
+		 this.dependent = new HashMap<>();
 	 }
 	 
 	  private static class TreeNode {
@@ -48,11 +54,59 @@ public class ExpressionTree {
 	  public ArrayList<String> getDependencies(String str){
 		   	ArrayList<String> retValues = new ArrayList<String>();
 			String[] strValues = str.split("\\s+");
+			
+			
 			for(String check : strValues){
-				if(!isOperator(check)){
+				if(Pattern.matches("[A-Z]\\d+", check)){
 					retValues.add(check);
 				}
 			}
 			return retValues;
 	  }
+	  
+	  public float evaluateTree(){
+		  float f = 0;
+		  try {
+			f = evaluate(root);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		 return f; 
+	  }
+	  
+	  public float evaluate(TreeNode n) throws Exception{
+		  if(n!=null){
+			  //leaf
+			  if(n.left==null&&n.right==null){
+				  if(dependent.get(n.ch) != null){
+					  return dependent.get(n.ch);
+				  }
+				  return Float.parseFloat(n.ch);
+			  }
+			  else{
+				  float left = evaluate(n.left);
+				  float right = evaluate(n.right);
+				  return apply.calculate(n.ch, left, right);
+			  }
+		  }
+		return 0;
+	  }
+	  
+//	  public String traverse() {
+//		  
+//		  if(root!=null){
+//	        final StringBuilder infix = new StringBuilder();
+//	        inOrder(root, infix);
+//	        return infix.toString();
+//		  }
+//		  return null;
+//	  }
+//	  
+//	  private void inOrder(TreeNode node, StringBuilder infix) {
+//	        if (node != null) {
+//	            inOrder(node.left, infix);
+//	            infix.append(node.ch);
+//	            inOrder(node.right, infix);
+//	        }
+//	    }
 }
