@@ -1,7 +1,5 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 
 public class Cell {
@@ -26,43 +24,46 @@ public class Cell {
 		postfix = new ExpressionTree(value);
 	}
 	
-	public int parse(){
-		char rowChar = (char) (this.row + 1 + 64);
-		char colChar = (char) (48 + 1 + this.column);
-		StringBuffer build = new StringBuffer();
-		build.append(rowChar);
-		build.append(colChar);
-		id = build.toString();
+	public ArrayList<String> parseAndGetDependencies(){
+		this.id = calculateId(this.row, this.column);
 		
 		ArrayList<String> dependencies = postfix.getDependencies(expression);
 		for(String s: dependencies){
-			if(!s.equals(id))
-				dependent.put(s, (float) 0);
+			dependent.put(s, (float) 0);
 		}
 		
-		int size = dependencies.size();
-		if(size==0){
+		if(dependencies.size()==0){
 			this.evaluated = true;
 			evaluatedExpression = postfix.evaluateTree();
 		}
 		
-		return size;
+		return dependencies;
 	}
 	
 	public void evaluateAgain(){
 		evaluatedExpression = postfix.evaluateTree();
 	}
 	
+	public String getId(){
+		return id;
+	}
+	
 	public void setDependent(HashMap map){
 		this.postfix.dependent = map;
-	}
-
-	public void setEvaluatedValue(float f) {
-		this.evaluatedExpression = f;
 	}
 	
 	public float getEvaluatedValue(){
 		return evaluatedExpression;
+	}
+	
+	//utility function
+	public static String calculateId(int row, int col){
+		char rowChar = (char) (row + 1 + 64);
+		char colChar = (char) (48 + 1 + col);
+		StringBuffer build = new StringBuffer();
+		build.append(rowChar);
+		build.append(colChar);
+		return build.toString();
 	}
 	
 }

@@ -14,6 +14,14 @@ public class ExpressionTree {
 	 public HashMap<String, Float> dependent;
 	 
 	 public ExpressionTree(String exp){
+		 while(exp.contains("++")){
+			 int plusIndex = exp.indexOf("++");
+			 exp = exp.substring(0, plusIndex)+"1 +"+exp.substring(plusIndex+2, exp.length() );
+		 }
+		 while(exp.contains("--")){
+			 int plusIndex = exp.indexOf("--");
+			 exp = exp.substring(0, plusIndex)+"1 -"+exp.substring(plusIndex+2, exp.length() );
+		 }
 		 this.postfix = exp.trim().split("\\s+");
 		 createExpressionTree();
 		 apply = new Operators();
@@ -91,22 +99,5 @@ public class ExpressionTree {
 		  }
 		return 0;
 	  }
-	  
-//	  public String traverse() {
-//		  
-//		  if(root!=null){
-//	        final StringBuilder infix = new StringBuilder();
-//	        inOrder(root, infix);
-//	        return infix.toString();
-//		  }
-//		  return null;
-//	  }
-//	  
-//	  private void inOrder(TreeNode node, StringBuilder infix) {
-//	        if (node != null) {
-//	            inOrder(node.left, infix);
-//	            infix.append(node.ch);
-//	            inOrder(node.right, infix);
-//	        }
-//	    }
+
 }
